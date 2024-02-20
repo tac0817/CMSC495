@@ -45,25 +45,25 @@ public class Store_GUI extends JFrame {
         panel.add(searchButton);
         panel.add(results);
         panel.add(resultList);
-        add(panel, FlowLayout.LEFT);
+        add(panel);
 
         setVisible(true);
 
     }
 
     private void onSearchButtonClick() {
-        JFileChooser file = new JFileChooser("");
-        File selectedFile = file.getSelectedFile();
+        File file = new File("");
         BufferedReader read;
-
+        resultList.removeAll();
+        
         if (searchBox.getText().contentEquals("Enter your product name here")
                 || searchBox.getText().isBlank()) {
             JOptionPane.showMessageDialog(this, "No product name was entered.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
-                read = new BufferedReader(new FileReader(selectedFile));
-                String fileLine = read.readLine();
-                resultList.removeAll();
+                read = new BufferedReader(new FileReader(file));
+                String fileLine = read.readLine();  
+                results.setText("results found");
 
                 if (fileLine != null) {
                     results = new JLabel("No results found");
