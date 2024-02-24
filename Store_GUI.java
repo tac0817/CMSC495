@@ -54,26 +54,31 @@ public class Store_GUI extends JFrame {
     private void onSearchButtonClick() {
         File file = new File("");
         BufferedReader read;
+        int i = 0;
+        ArrayList<JLabel> products = new ArrayList<>();
+        results.setText("");
         resultList.removeAll();
-        
+
         if (searchBox.getText().contentEquals("Enter your product name here")
                 || searchBox.getText().isBlank()) {
             JOptionPane.showMessageDialog(this, "No product name was entered.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
                 read = new BufferedReader(new FileReader(file));
-                String fileLine = read.readLine();  
-                results.setText("results found");
-
-                if (fileLine != null) {
-                    results = new JLabel("No results found");
-                } else {
-                    results = new JLabel("Results found");
-                }
+                String fileLine = read.readLine();
 
                 while (fileLine != null) {
                     if (fileLine.contains(searchBox.getText())) {
-                        resultList.add(new JLabel(fileLine));
+                        results.setText("Results Found");
+                        products.add(new JLabel(fileLine));
+                        products.get(i).addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent me) {
+                                
+                            }
+                        });
+                        resultList.add(products.get(i));
+                        i++;
                     }
                     fileLine = read.readLine();
                 }
