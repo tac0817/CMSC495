@@ -1,14 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package inventory_system;
+package Inventory_System;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Store_GUI extends JFrame {
 
@@ -92,8 +89,11 @@ public class Store_GUI extends JFrame {
 
         }
     }
-
+    
+ 
+    
     public static void main(String[] args) {
-        new Store_GUI();
+    	
+    		LoginDisplay Login_GUI = new LoginDisplay();
     }
 }
