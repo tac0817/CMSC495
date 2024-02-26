@@ -48,8 +48,9 @@ public class LoginDisplay extends JFrame{
 		loginButton.addActionListener(new ActionListener() {
 			@Override 
 			public void actionPerformed(ActionEvent e) {
-			
+			User user = Login.getCurrentUser();
 				onLoginButtonClick();
+				System.out.println(user.getName() + "\n" + user.getUsername() + "\n" + user.getMainStore() + "\n" + user.isAdmin());
 			}
 		});
 		

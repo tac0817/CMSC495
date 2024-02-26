@@ -13,6 +13,7 @@ import java.util.List;
 
 public class Login {
 	private static String filePath = "User_DB.txt";
+	private static User currentUser;
 	
 	public static boolean userExists(String username) {
 		boolean userExists = false;
@@ -93,7 +94,7 @@ public class Login {
     public static boolean verifyLogin(String inputUsername, String inputPassword) {
     	
     	boolean matchingPassword = false;
-    	
+		
     	try {
     		
     		List<String> lines = Files.readAllLines(Paths.get(filePath));
@@ -109,6 +110,8 @@ public class Login {
     		for (String[] user : userDataList) {
     			
     			if(user[1].equals(inputUsername)) {
+    				setCurrentUser(user[0], user[1], user[4], Boolean.parseBoolean(user[3]));
+    				
     				matchingPassword = passwordMatch(inputPassword, user[2]);
     			}
     		}
@@ -118,6 +121,15 @@ public class Login {
     		System.out.println("File Could not be found.");
     	}
 		return matchingPassword;
+    }
+    
+    public static void setCurrentUser(String name, String username, String mainStore, Boolean isAdmin) {
+    	
+    	currentUser = new User(name, username, mainStore, isAdmin);
+    }
+    
+    public static User getCurrentUser() {
+    	return currentUser;
     }
     
     public static String checkPasswordComplexity(String password) {

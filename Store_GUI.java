@@ -19,6 +19,12 @@ public class Store_GUI extends JFrame {
     public Store_GUI() {
         setTitle("Store Page");
         setSize(350, 500);
+        
+        JTabbedPane tabbedPane = new JTabbedPane();
+        
+        JPanel adminPanel = new JPanel();
+        adminPanel = createAdminPanel();
+        
         searchBox = new JTextField("Enter your product name here", 30);
         JLabel welcome = new JLabel("Welcome to [Store Name] store page!");
         JLabel stockText = new JLabel("Store: ");
@@ -61,27 +67,77 @@ public class Store_GUI extends JFrame {
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 10));
+        JPanel userPanel = new JPanel();
+        userPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 10));
         resultList = new JPanel();
         resultList.setLayout(new BoxLayout(resultList, BoxLayout.Y_AXIS));
-        panel.add(signoutButton);
-        panel.add(welcome);
-        panel.add(stockText);
-        panel.add(locales);
-        panel.add(cartLabel);
-        panel.add(cart);
-        panel.add(searchBox);
-        panel.add(searchButton);
-        panel.add(results);
-        panel.add(resultList);
-        add(panel);
-        panel.add(cButton);
+        
+        userPanel.add(signoutButton);
+        userPanel.add(welcome);
+        userPanel.add(stockText);
+        userPanel.add(locales);
+        userPanel.add(cartLabel);
+        userPanel.add(cart);
+        userPanel.add(searchBox);
+        userPanel.add(searchButton);
+        userPanel.add(results);
+        userPanel.add(resultList);
+        userPanel.add(cButton);
+        
+        tabbedPane.addTab("Inventory System", userPanel);
+        tabbedPane.addTab("Admin/Modification", adminPanel);
+        
+        add(tabbedPane);
 
         setVisible(true);
 
     }
 
+    private JPanel createAdminPanel() {
+    	JPanel adminPanel = new JPanel(new GridBagLayout());
+    	
+    	JButton addButton = new JButton("Add Item");
+    	JButton removeButton = new JButton("Remove Item");
+    	JButton moveButton = new JButton("Transfer Item");
+    	JButton rentalButton = new JButton("Return Rental");
+    	
+    	Inventory_Modification adminActions = new Inventory_Modification();
+    	
+    	addButton.addActionListener(e -> {
+    		adminActions.addItem();
+    	});
+    	
+    	removeButton.addActionListener(e -> {
+    		adminActions.deleteItem();
+    	});
+    	
+    	moveButton.addActionListener(e -> {
+    		adminActions.transferItem();
+    	});
+    	
+    	rentalButton.addActionListener(e -> {
+    		adminActions.returnRental();
+    	});
+    	
+    	GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        
+        adminPanel.add(addButton, gbc);
+        
+        gbc.gridy++;
+        adminPanel.add(removeButton, gbc);
+        
+        gbc.gridy++;
+        adminPanel.add(moveButton, gbc);
+        
+        gbc.gridy++;
+        adminPanel.add(rentalButton, gbc);
+
+    	return adminPanel;
+    }
+    
     private void onSearchButtonClick() {
         File file;
         if (locales.getSelectedItem().equals("Towson")) {
@@ -175,7 +231,7 @@ public class Store_GUI extends JFrame {
         checkoutPage.add(purchaseLabel);
         checkoutPage.add(payment);
         
-        checkoutPage.setLocationRelativeTo(this);
+        checkoutPage.setLocationRelativeTo(null);
         checkoutPage.setVisible(true);
         checkoutPage.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
