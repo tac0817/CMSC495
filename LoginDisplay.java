@@ -48,9 +48,8 @@ public class LoginDisplay extends JFrame{
 		loginButton.addActionListener(new ActionListener() {
 			@Override 
 			public void actionPerformed(ActionEvent e) {
-			User user = Login.getCurrentUser();
+			
 				onLoginButtonClick();
-				System.out.println(user.getName() + "\n" + user.getUsername() + "\n" + user.getMainStore() + "\n" + user.isAdmin());
 			}
 		});
 		
@@ -87,6 +86,8 @@ public class LoginDisplay extends JFrame{
         String username = usernameText.getText();
         char[] passwordChars = passwordText.getPassword();
         String password = new String(passwordChars);
+        
+        
 
         // Call verifyLogin method from PasswordHashing class
         boolean loginSuccessful = false;
@@ -104,6 +105,10 @@ public class LoginDisplay extends JFrame{
             JOptionPane.showMessageDialog(this, "Login successful!");
             LoggedIn = true; 
             dispose();
+            
+            User user = Login.getCurrentUser();
+			System.out.println(user.getName() + "\n" + user.getUsername() + "\n" + user.getMainStore() + "\n" + user.isAdmin());
+
             new Store_GUI();
         } 
         
