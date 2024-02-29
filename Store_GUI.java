@@ -10,24 +10,19 @@ import java.util.ArrayList;
 public class Store_GUI extends JFrame {
 
     private JTextField searchBox;
+    User currentUser = Login.getCurrentUser();
     JLabel results;
     JPanel resultList;
-    String[] storeLoc = {"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"};
     List cart;
-    JComboBox locales = new JComboBox(storeLoc);
+    JComboBox storeLoc = new JComboBox(new String[]{"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"});
 
     public Store_GUI() {
         setTitle("Store Page");
-        setSize(350, 500);
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
-        
-        JPanel adminPanel = new JPanel();
-        adminPanel = createAdminPanel();
-        
+        setSize(700, 630);
         searchBox = new JTextField("Enter your product name here", 30);
-        JLabel welcome = new JLabel("Welcome to [Store Name] store page!");
+        JLabel welcome = new JLabel("Welcome to the Buy Better store page!");
         JLabel stockText = new JLabel("Store: ");
+        storeLoc.setSelectedItem(currentUser.getMainStore());
         JLabel cartLabel = new JLabel("Cart:");
         cart = new List();
         cart.addMouseListener(new MouseAdapter() {
@@ -41,116 +36,47 @@ public class Store_GUI extends JFrame {
 
         results = new JLabel();
         JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onSearchButtonClick();
-            }
+        searchButton.addActionListener((ActionEvent e) -> {
+            onSearchButtonClick();
         });
 
         JButton cButton = new JButton("To Checkout");
-        cButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCheckoutButtonClick();
-            }
-        });
-        
+                cButton.addActionListener((ActionEvent e) -> {
+                    onCheckoutButtonClick();
+                });
+
         JButton signoutButton = new JButton("Sign Out");
-        signoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                new LoginDisplay();
-            }
+        signoutButton.addActionListener((ActionEvent e) -> {
+            dispose();
+            new LoginDisplay();
         });
-        
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel userPanel = new JPanel();
-        userPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 10));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 10));
         resultList = new JPanel();
         resultList.setLayout(new BoxLayout(resultList, BoxLayout.Y_AXIS));
-        
-        userPanel.add(signoutButton);
-        userPanel.add(welcome);
-        userPanel.add(stockText);
-        userPanel.add(locales);
-        userPanel.add(cartLabel);
-        userPanel.add(cart);
-        userPanel.add(searchBox);
-        userPanel.add(searchButton);
-        userPanel.add(results);
-        userPanel.add(resultList);
-        userPanel.add(cButton);
-        
-        tabbedPane.addTab("Inventory System", userPanel);
-        tabbedPane.addTab("Admin/Modification", adminPanel);
-        
-        add(tabbedPane);
+        panel.add(signoutButton);
+        panel.add(welcome);
+        panel.add(stockText);
+        panel.add(storeLoc);
+        panel.add(cartLabel);
+        panel.add(cart);
+        panel.add(searchBox);
+        panel.add(searchButton);
+        panel.add(results);
+        panel.add(resultList);
+        panel.add(cButton);
+        add(panel);
 
         setVisible(true);
 
     }
 
-    private JPanel createAdminPanel() {
-    	JPanel adminPanel = new JPanel(new GridBagLayout());
-    	
-    	JButton addButton = new JButton("Add Item");
-    	JButton removeButton = new JButton("Remove Item");
-    	JButton moveButton = new JButton("Transfer Item");
-    	JButton rentalButton = new JButton("Return Rental");
-    	
-    	Inventory_Modification adminActions = new Inventory_Modification();
-    	
-    	addButton.addActionListener(e -> {
-    		adminActions.addItem();
-    	});
-    	
-    	removeButton.addActionListener(e -> {
-    		adminActions.deleteItem();
-    	});
-    	
-    	moveButton.addActionListener(e -> {
-    		adminActions.transferItem();
-    	});
-    	
-    	rentalButton.addActionListener(e -> {
-    		adminActions.returnRental();
-    	});
-    	
-    	GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        
-        adminPanel.add(addButton, gbc);
-        
-        gbc.gridy++;
-        adminPanel.add(removeButton, gbc);
-        
-        gbc.gridy++;
-        adminPanel.add(moveButton, gbc);
-        
-        gbc.gridy++;
-        adminPanel.add(rentalButton, gbc);
-
-    	return adminPanel;
-    }
-    
     private void onSearchButtonClick() {
-        File file;
-        if (locales.getSelectedItem().equals("Towson")) {
-            file = new File("C:\\Users\\jaden\\OneDrive\\Documents\\NetBeansProjects\\Inventory_System\\src\\inventory_search\\Store 1.txt");
-        } else if (locales.getSelectedItem().equals("Columbia")) {
-            file = new File("");
-        } else if (locales.getSelectedItem().equals("Annapolis")) {
-            file = new File("");
-        } else if (locales.getSelectedItem().equals("Rockville")) {
-            file = new File("");
-        } else {
-            file = new File("");
-        }
+        String store = (String) storeLoc.getSelectedItem();
+        File file = new File("C:\\Users\\jaden\\OneDrive\\Documents\\NetBeansProjects\\InventorySystem\\src\\inventorysystem\\Buy_Better_" + store + ".txt");
 
         BufferedReader read;
         ArrayList<JLabel> products = new ArrayList<>();
@@ -167,14 +93,14 @@ public class Store_GUI extends JFrame {
                 int i = 0;
 
                 while (fileLine != null) {
-                    if (fileLine.contains(searchBox.getText())) {
-                        String p = fileLine;
+                    String[] item = fileLine.split(";");
+                    if (item[1].contains(searchBox.getText()) || item[2].contains(searchBox.getText())) {
                         results.setText("Results Found");
-                        products.add(new JLabel(fileLine));
+                        products.add(new JLabel(item[1] + ": " + item[3]));
                         products.get(i).addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseClicked(MouseEvent me) {
-                                cart.add(p);
+                                cart.add(item[1]);
                             }
                         });
                         resultList.add(products.get(i));
@@ -182,6 +108,7 @@ public class Store_GUI extends JFrame {
                     }
                     fileLine = read.readLine();
                 }
+
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(this, "The Store's stock file could not be found.", "Error", JOptionPane.ERROR_MESSAGE);
             } catch (IOException ex) {
@@ -211,15 +138,15 @@ public class Store_GUI extends JFrame {
 
         JDialog checkoutPage = new JDialog(this, "Checkout", true);
         checkoutPage.setSize(550, 250);
-        checkoutPage.setLayout(new GridLayout(cart.getItemCount(), 2,20, 20));
+        checkoutPage.setLayout(new GridLayout(cart.getItemCount(), 2, 20, 20));
 
         JLabel itemLabel = new JLabel("Item Name:");
         JLabel numLabel = new JLabel("Item Amount:");
         JLabel purchaseLabel = new JLabel("Choose a payment method:");
         JComboBox payment = new JComboBox(new String[]{"Credit Card (Visa)", "Credit Card (MasterCard)", "PayPal"});
 
-        checkoutPage.add(itemLabel, 0,0);
-        checkoutPage.add(numLabel, 0,1);
+        checkoutPage.add(itemLabel, 0, 0);
+        checkoutPage.add(numLabel, 0, 1);
 
         for (int i = 0; i < itemNum.length; i++) {
             if (itemNum[i] != -1) {
@@ -227,18 +154,18 @@ public class Store_GUI extends JFrame {
                 checkoutPage.add(new JLabel("" + itemNum[i]));
             }
         }
-        
+
         checkoutPage.add(purchaseLabel);
         checkoutPage.add(payment);
-        
-        checkoutPage.setLocationRelativeTo(null);
+
+        checkoutPage.setLocationRelativeTo(this);
         checkoutPage.setVisible(true);
         checkoutPage.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
     }
-    
+
     public static void main(String[] args) {
-    	
-    		LoginDisplay Login_GUI = new LoginDisplay();
+
+        LoginDisplay Login_GUI = new LoginDisplay();
     }
 }
