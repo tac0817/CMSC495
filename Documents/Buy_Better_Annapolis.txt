@@ -1,0 +1,17 @@
+1;Electric Bake Master Deluxe;Oven and Range;Precision cooking with modern design;$1,299.99;8;buy
+2;Tower Cool Breeze 300;Electric Fan;Powerful electric fan for cooling larger spaces.;$79.99;25;buy
+3;Convection Toast Master 2000;Toaster;High-quality toaster with convection technology.;$49.99;20;buy
+4;Infrared Heat Wave 1500;Heater;Infrared technology and cozy heating in any room.;$129.99;15;buy
+5;Professional Style Master 6000;Hair Dryer;High-performance hair dryer for professional use.;$69.99;18;buy
+6;Entertainment Hub 4K;Blu-ray/DVD Player;High-quality entertainment with 4K resolution.;$129.99;15;buy
+7;Modern Connect 3000;Cordless Phone;Modern features, reliable communication.;$79.99;15;buy
+8;High-Capacity Culinary Master 1200;Food Processor;Versatile, efficient food preparation with high capacity.;$199.99;15;buy
+9;Deluxe Rice King 10;Rice Cooker;High-capacity rice cooker for perfect large quantities.;$79.99;8;buy
+10;Power Blend Pro Chef 800;Stand Mixer;For professional mixing and blending in the kitchen.;$299.99;12;buy
+11;Healthy Cook Aero Fryer 1000;Air Fryer;Healthier cooking with air frying technology.;$119.99;12;buy
+12;Compact Pure Air 5000;Air Purifier;Efficient air purifier designed to provide clean and fresh air.;$159.99;15;buy
+13;Conference Call Phone;Cordless Phone;Conference call phone suitable for business meetings or temporary office setups.;$14.99;16;rent
+14;Industrial-Grade Food Processor;Food Processor;Industrial-grade food processor for catering events or large-scale food preparation;$16.99;17;rent
+15;Large-Capacity Rice Cooker;Rice Cooker;Large-capacity rice cooker for catering events or family gatherings.;$13.99;18;rent
+16;Commercial-Grade Stand Mixer;Stand Mixer;Commercial-grade stand mixer for large scale baking or professional kitchens.;$19.99;19;rent
+17;Compact Air Fryer;Air Fryer;Compact air fryer for trying out the appliance before making a purchase.;$9.99;20;rent

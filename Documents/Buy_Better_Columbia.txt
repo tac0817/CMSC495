@@ -1,0 +1,21 @@
+1;Model ABC123;Refrigerator;Sleek and efficient refrigerator;$799.99;15;buy
+2;Front Load XYZ456;Washing Machine;Advanced cleaning technology with features;$899.99;10;buy
+3;Countertop Deluxe 789;Microwave;Versatile cooking options and a stylish design;$129.99;20;buy
+4;Split Sys Cool Breeze 2000;Air Conditioner;Efficient cooling with advanced technology;$1,199.99;8;buy
+5;Smart TV UltraVision 4K;Television;Immersive and interactive entertainment experience;$999.99;12;buy
+6;Espresso Elite 3000;Coffee Maker;Precision brewing with a sleek design;$149.99;18;buy
+7;Upright Pro Clean 1000;Vacuum Cleaner;Powerful and versatile cleaning solution;$249.99;15;buy
+8;Fusion Blitz 500;Blender;High-performance handles a variety of ingredients;$179.99;10;buy
+9;Aqua Clean 800;Dishwasher;Advanced cleaning and a space-saving design;$699.99;10;buy
+10;Electric Bake Master Deluxe;Oven and Range;Precision cooking with modern design;$1,299.99;8;buy
+11;Tower Cool Breeze 300;Electric Fan;Powerful electric fan for cooling larger spaces;$79.99;25;buy
+12;Convection Toast Master 2000;Toaster;High-quality toaster with convection technology;$49.99;20;buy
+13;Infrared Heat Wave 1500;Heater;Infrared technology and cozy heating in any room;$129.99;15;buy
+14;Professional StyleMaster 6000;Hair Dryer;High-performance hair dryer for professional use;$69.99;10;buy
+15;Entertainment Hub 4K;Blu-ray/DVD Player;High-quality entertainment, 4K resolution;$129.99;10;buy
+16;Stylist Curl Deluxe;Curling Iron;Advanced curling iron with temperature control;$49.99;20;buy
+17;Portable Electric Fan;Electric Fan;Portable fans for rent suitable for outdoor events or temporary cooling needs.;$5.99;30;rent
+18;Commercial-Grade Toaster;Toaster;Commercial-grade toasters for rent suitable for catering events or large gatherings;$10.99;12;rent
+19;Portable Space Heater;Heater;Portable space heaters for rent suitable for temporary heating in specific areas;$9.99;20;rent
+20;Salon-Quality Hair Dryer;Hair Dryer;Salon-quality hair dryers for rent suitable for events or special occasions;$7.99;15;rent
+21;Portable DVD Player;Blu-ray/DVD Player;Portable DVD players for rent suitable for travel or temporary use;$6.99;25;rent
