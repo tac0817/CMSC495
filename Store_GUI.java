@@ -21,7 +21,8 @@ public class Store_GUI extends JFrame {
     	setTitle("Store Page");
         setSize(700, 630);
         searchBox = new JTextField("Enter your product name here", 30);
-        
+        storeLoc.setSelectedItem(currentUser.getMainStore())
+        ;
         JTabbedPane tabbedPane = new JTabbedPane();
         
         if(currentUser.isAdmin()) {
