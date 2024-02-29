@@ -9,9 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -250,20 +254,284 @@ public class Inventory_Modification {
 	
 	
 	public void deleteItem() {
-		System.out.println("Test delete");
+        // Create a new frame for deleting items
+        JFrame deleteItemFrame = new JFrame("Delete Item");
+        deleteItemFrame.setSize(800, 400);
+        deleteItemFrame.setLayout(new BorderLayout());
 
-	}
+        // Drop-down list for selecting the store
+        JComboBox<String> storeDropdown = new JComboBox<>(new String[]{"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"});
+
+        // Table for displaying inventory
+        String[] columnNames = {"Item ID", "Item Name", "Category", "Description", "Price", "Stock", "Rent/Buy"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable inventoryTable = new JTable(tableModel);
+        JScrollPane tableScrollPane = new JScrollPane(inventoryTable);
+
+        // Button for deleting selected item
+        JButton deleteButton = new JButton("Delete Item");
+
+        // Add components to the frame
+        deleteItemFrame.add(storeDropdown, BorderLayout.NORTH);
+        deleteItemFrame.add(tableScrollPane, BorderLayout.CENTER);
+        deleteItemFrame.add(deleteButton, BorderLayout.SOUTH);
+
+        // Populate the table when the store is selected
+        storeDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Update the table based on the selected store
+                updateTable((String) storeDropdown.getSelectedItem(), tableModel);
+            }
+        });
+
+        // Action listener for the delete button
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the selected row and delete the corresponding item
+                int selectedRow = inventoryTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Delete the item from the file
+                    deleteItemFromFile((String) storeDropdown.getSelectedItem(), selectedRow);
+
+                    // Update the table after deletion
+                    updateTable((String) storeDropdown.getSelectedItem(), tableModel);
+                } else {
+                    JOptionPane.showMessageDialog(deleteItemFrame, "Please select an item to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Display the frame
+        deleteItemFrame.setLocationRelativeTo(null);
+        deleteItemFrame.setVisible(true);
+    }
 	
-	public void transferItem() {
-		System.out.println("Test transfer");
+    private void updateTable(String store, DefaultTableModel tableModel) {
+        // Load inventory for the selected store
+        ArrayList<String[]> inventoryList = loadInventory(store);
 
-	}
+        // Clear existing data from the table
+        tableModel.setRowCount(0);
+
+        // Populate the table with columns 1 to 7
+        for (String[] rowData : inventoryList) {
+            // Ensure rowData has at least 7 columns
+            if (rowData.length >= 7) {
+                tableModel.addRow(Arrays.copyOf(rowData, 7));
+            }
+        }
+    }
+	
+    private void deleteItemFromFile(String store, int selectedRow) {
+        String fileName = "Buy_Better_" + store + ".txt";
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
+             BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"))) {
+            String line;
+            int currentRow = 0;
+
+            while ((line = reader.readLine()) != null) {
+                // Skip the line to delete
+                if (currentRow++ != selectedRow) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+
+        // Replace the original file with the temporary file
+        try {
+            Files.delete(Paths.get(fileName));
+            Files.move(Paths.get("temp.txt"), Paths.get(fileName));
+            System.out.println("Item deleted successfully.");
+        } catch (IOException e) {
+            System.out.println("Failed to delete item.");
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+    
+    public void transferItem() {
+        // Create a new frame for transferring items
+        JFrame transferItemFrame = new JFrame("Transfer Item");
+        transferItemFrame.setSize(1000, 600);
+        transferItemFrame.setLayout(new BorderLayout());
+
+        // Drop-down lists for selecting the source and destination stores
+        JComboBox<String> sourceStoreDropdown = new JComboBox<>(new String[]{"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"});
+        JComboBox<String> destinationStoreDropdown = new JComboBox<>(new String[]{"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"});
+
+        // Table for displaying items from the source store
+        String[] columnNamesSource = {"Item ID", "Item Name"};
+        DefaultTableModel sourceTableModel = new DefaultTableModel(columnNamesSource, 0);
+        JTable sourceTable = new JTable(sourceTableModel);
+        JScrollPane sourceTableScrollPane = new JScrollPane(sourceTable);
+
+        // Table for displaying items to transfer
+        String[] columnNamesTransfer = {"Item ID", "Item Name"};
+        DefaultTableModel transferTableModel = new DefaultTableModel(columnNamesTransfer, 0);
+        JTable transferTable = new JTable(transferTableModel);
+        JScrollPane transferTableScrollPane = new JScrollPane(transferTable);
+
+        // Button for transferring selected items
+        JButton transferButton = new JButton("Transfer Selected Items");
+
+        // Add components to the frame
+        JPanel storeDropdownPanel = new JPanel(new FlowLayout());
+        storeDropdownPanel.add(new JLabel("Source Store:"));
+        storeDropdownPanel.add(sourceStoreDropdown);
+        storeDropdownPanel.add(new JLabel("Destination Store:"));
+        storeDropdownPanel.add(destinationStoreDropdown);
+
+        transferItemFrame.add(storeDropdownPanel, BorderLayout.NORTH);
+        transferItemFrame.add(sourceTableScrollPane, BorderLayout.WEST);
+        transferItemFrame.add(transferTableScrollPane, BorderLayout.EAST);
+        transferItemFrame.add(transferButton, BorderLayout.SOUTH);
+
+        // Populate the source store table when the source store is selected
+        sourceStoreDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Load inventory for the source store
+                String sourceStore = (String) sourceStoreDropdown.getSelectedItem();
+                ArrayList<String[]> sourceInventory = loadInventory(sourceStore);
+
+                // Clear existing data from the source table
+                sourceTableModel.setRowCount(0);
+
+                // Populate the source table with columns 1 and 2
+                for (String[] rowData : sourceInventory) {
+                    // Ensure rowData has at least 2 columns
+                    if (rowData.length >= 2) {
+                        sourceTableModel.addRow(Arrays.copyOf(rowData, 2));
+                    }
+                }
+            }
+        });
+        
+        // Populate the destination store table when the destination store is selected
+        destinationStoreDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Load inventory for the destination store
+                String destinationStore = (String) destinationStoreDropdown.getSelectedItem();
+                ArrayList<String[]> destinationInventory = loadInventory(destinationStore);
+
+                // Clear existing data from the destination table
+                transferTableModel.setRowCount(0);
+
+                // Populate the destination table with columns 1 and 2
+                for (String[] rowData : destinationInventory) {
+                    // Ensure rowData has at least 2 columns
+                    if (rowData.length >= 2) {
+                        transferTableModel.addRow(Arrays.copyOf(rowData, 2));
+                    }
+                }
+            }
+        });
+
+        // Display the frame
+        transferItemFrame.setLocationRelativeTo(null);
+        transferItemFrame.setVisible(true);
+        
+        // Event handling for the transferButton
+        transferButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the selected rows from the source table
+                int[] selectedRows = sourceTable.getSelectedRows();
+                if (selectedRows.length > 0) {
+                    for (int selectedRow : selectedRows) {
+                        String selectedItemId = sourceTableModel.getValueAt(selectedRow, 0).toString();
+                        String selectedItemName = sourceTableModel.getValueAt(selectedRow, 1).toString();
+                        transferItem(sourceStoreDropdown, destinationStoreDropdown, selectedItemId, selectedItemName);
+                    }
+                    // Update the source and destination tables after transfer
+                    updateTable((String) sourceStoreDropdown.getSelectedItem(), sourceTableModel);
+                    updateTable((String) destinationStoreDropdown.getSelectedItem(), transferTableModel);
+                } else {
+                    JOptionPane.showMessageDialog(transferItemFrame, "Please select an item to transfer.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+ // Method to transfer item from source store to destination store
+    private void transferItem(JComboBox<String> sourceDropdown, JComboBox<String> destinationDropdown,
+                               String selectedItemId, String selectedItemName) {
+        String sourceStore = (String) sourceDropdown.getSelectedItem();
+        String destinationStore = (String) destinationDropdown.getSelectedItem();
+
+        // Read the source inventory
+        ArrayList<String[]> sourceInventory = loadInventory(sourceStore);
+
+        // Remove the transferred item from the source inventory
+        sourceInventory.removeIf(row -> row.length >= 2 && row[0].equals(selectedItemId) && row[1].equals(selectedItemName));
+
+        // Write back the updated source inventory
+        writeInventory(sourceStore, sourceInventory);
+
+        // Read the destination inventory
+        ArrayList<String[]> destinationInventory = loadInventory(destinationStore);
+
+        // Determine the destination item ID (current line number + 1)
+        int destinationItemId = getNumberOfLines("Buy_Better_" + destinationStore + ".txt") + 1;
+
+        // Create the new line for the destination store
+        String newLine = destinationItemId + ";" + selectedItemName;
+
+        // Append the new line to the destination inventory
+        destinationInventory.add(newLine.split(";"));
+
+        // Write back the updated destination inventory
+        writeInventory(destinationStore, destinationInventory);
+        
+        // Update IDs in the source inventory to start from 1 again
+        updateIdsInSource(sourceStore);
+    }
+    
+    // Helper method to update IDs in the source inventory
+    private void updateIdsInSource(String sourceStore) {
+        // Read the source inventory
+        ArrayList<String[]> sourceInventory = loadInventory(sourceStore);
+
+        // Update the IDs starting from 1 again
+        for (int i = 0; i < sourceInventory.size(); i++) {
+            String[] rowData = sourceInventory.get(i);
+            if (rowData.length >= 1) {
+                rowData[0] = String.valueOf(i + 1);
+            }
+        }
+
+        // Write back the updated source inventory
+        writeInventory(sourceStore, sourceInventory);
+    }
+    
+    // Helper method to write inventory data back to the file
+    private void writeInventory(String store, ArrayList<String[]> inventory) {
+        String fileName = "Buy_Better_" + store + ".txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (String[] rowData : inventory) {
+                // Join the columns with a semicolon and write to the file
+                writer.write(String.join(";", rowData));
+                writer.newLine(); // Add a new line after each entry
+            }
+        } 
+        catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+    
+  
 	
 	public void returnRental() {
 		System.out.println("Test return");
 
 	}
-	
+
 	public static ArrayList<String[]> loadInventory(String store) {
 	    String fileName = "Buy_Better_" + store + ".txt";
 	    ArrayList<String[]> inventoryList = new ArrayList<>();

@@ -107,9 +107,8 @@ public class LoginDisplay extends JFrame{
             dispose();
             
             User user = Login.getCurrentUser();
-			System.out.println(user.getName() + "\n" + user.getUsername() + "\n" + user.getMainStore() + "\n" + user.isAdmin());
 
-            new Store_GUI();
+            new Store_GUI(user);
         } 
         
         else {

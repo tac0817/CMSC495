@@ -110,7 +110,11 @@ public class Login {
     		for (String[] user : userDataList) {
     			
     			if(user[1].equals(inputUsername)) {
-    				setCurrentUser(user[0], user[1], user[4], Boolean.parseBoolean(user[3]));
+    				boolean isAdmin = false;
+    				if (user[3].equals("1")) {
+    					isAdmin = true;
+    				}
+    				setCurrentUser(user[0], user[1], user[4], isAdmin);
     				
     				matchingPassword = passwordMatch(inputPassword, user[2]);
     			}
