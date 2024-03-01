@@ -159,7 +159,7 @@ public class Store_GUI extends JFrame {
 
     private void onSearchButtonClick() {
         String store = (String) storeLoc.getSelectedItem();
-        File file = new File("./src/inventorysystem/Buy_Better_" + store + ".txt");
+        File file = new File("./src/inventory_system/Buy_Better_" + store + ".txt");
 
         BufferedReader read;
         results.setText("");
