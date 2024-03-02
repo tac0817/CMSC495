@@ -12,7 +12,7 @@ import java.util.Base64;
 import java.util.List;
 
 public class Login {
-	private static String filePath = ".\\documents\\User_DB.txt";
+	private static String filePath = ".\\Documents\\User_DB.txt";
 	private static User currentUser;
 	
 	public static boolean userExists(String username) {

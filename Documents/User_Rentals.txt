@@ -1,1 +1,4 @@
 Rockville;jRuss;Commercial-Grade Sous Vide Machine;6
+Towson;tcol;Portable Space Heater;2
+Columbia;admin;Portable Electric Fan;3
+Columbia;tcol;Industrial-Grade Vacuum Cleaner;1

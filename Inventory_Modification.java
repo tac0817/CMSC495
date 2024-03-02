@@ -177,7 +177,7 @@ public class Inventory_Modification {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            // Get data from text fields and radio buttons
-	        	int itemId = getNumberOfLines(".\\documents\\Buy_Better_" + selectedStore + ".txt") + 1;
+	        	int itemId = getNumberOfLines(".\\Documents\\Buy_Better_" + selectedStore + ".txt") + 1;
 	            String itemName = itemNameField.getText();
 	            String category = categoryField.getText();
 	            String description = descriptionArea.getText();
@@ -228,7 +228,7 @@ public class Inventory_Modification {
 	            String newLine = itemId + ";" + itemName + ";" + category + ";" + description + ";" + formattedPrice + ";" + stock + ";" + rentOrBuy;
 
 	            // Append the new line to the file
-	            try (BufferedWriter writer = new BufferedWriter(new FileWriter(".\\documents\\Buy_Better_" + selectedStore + ".txt", true))) {
+	            try (BufferedWriter writer = new BufferedWriter(new FileWriter(".\\Documents\\Buy_Better_" + selectedStore + ".txt", true))) {
 	                writer.write(newLine);
 	                writer.newLine();  // Add a new line after each entry
 	                JOptionPane.showMessageDialog(addItemFrame, "Item added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -339,7 +339,7 @@ public class Inventory_Modification {
     }
 	
     private void deleteItemFromFile(String store, int selectedRow) {
-        String fileName = ".\\documents\\Buy_Better_" + store + ".txt";
+        String fileName = ".\\Documents\\Buy_Better_" + store + ".txt";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
              BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"))) {
@@ -512,7 +512,7 @@ public class Inventory_Modification {
         if (!itemExists) {
             // Item does not exist, add a new entry with transferred stock count
             // Determine the destination item ID (current line number + 1)
-            int destinationItemId = getNumberOfLines(".\\documents\\Buy_Better_" + destinationStore + ".txt") + 1;
+            int destinationItemId = getNumberOfLines(".\\Documents\\Buy_Better_" + destinationStore + ".txt") + 1;
 
             // Create the new line for the destination store
             String newLine = destinationItemId + ";" + selectedItemName;
@@ -547,7 +547,7 @@ public class Inventory_Modification {
     
     // Helper method to write inventory data back to the file
     private void writeInventory(String store, ArrayList<String[]> inventory) {
-        String fileName = ".\\documents\\Buy_Better_" + store + ".txt";
+        String fileName = ".\\Documents\\Buy_Better_" + store + ".txt";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (String[] rowData : inventory) {
@@ -780,7 +780,7 @@ public class Inventory_Modification {
     
     private void returnItemToStore(String itemName, int quantity, String storeName) {
     	//Store name
-    	String storeFilePath = ".\\documents\\Buy_Better_" + storeName + ".txt";
+    	String storeFilePath = ".\\Documents\\Buy_Better_" + storeName + ".txt";
     	
     	try (BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));) {
 
@@ -822,7 +822,7 @@ public class Inventory_Modification {
     }
 	
 	public static ArrayList<String[]> loadInventory(String store) {
-	    String fileName = ".\\documents\\Buy_Better_" + store + ".txt";
+	    String fileName = ".\\Documents\\Buy_Better_" + store + ".txt";
 	    ArrayList<String[]> inventoryList = new ArrayList<>();
 
 	    try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
