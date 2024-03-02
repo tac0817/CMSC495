@@ -19,7 +19,7 @@ public class Store_GUI extends JFrame {
 
     public Store_GUI(User currentUser) {
 
-        setTitle("Store Page");
+        setTitle("Store Page"); 
         setSize(820, 630);
         searchBox = new JTextField("Enter your product name here", 30);
         storeLoc.setSelectedItem(currentUser.getMainStore());
@@ -159,7 +159,7 @@ public class Store_GUI extends JFrame {
 
     private void onSearchButtonClick() {
         String store = (String) storeLoc.getSelectedItem();
-        File file = new File("Buy_Better_" + store + ".txt");
+        File file = new File(".\\documents\\Buy_Better_" + store + ".txt");
 
         BufferedReader read;
         results.setText("");
@@ -273,7 +273,7 @@ public class Store_GUI extends JFrame {
     }
 
     private float getItemPrice(String i) {
-        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File(".\\documents\\Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
 
         try {
@@ -298,7 +298,7 @@ public class Store_GUI extends JFrame {
     }
 
     private void checkoutItem(String i, int n) {
-        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File(".\\documents\\Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
         ArrayList<String> fileUpdate = new ArrayList<>();
 
@@ -316,7 +316,7 @@ public class Store_GUI extends JFrame {
             }
             
             
-            try (FileWriter writer = new FileWriter("Buy_Better_" + i.split("; ")[1] + ".txt")) {
+            try (FileWriter writer = new FileWriter(".\\documents\\Buy_Better_" + i.split("; ")[1] + ".txt")) {
                 for (String str : fileUpdate) {
                     writer.write(str + System.lineSeparator());
                 }
@@ -332,7 +332,7 @@ public class Store_GUI extends JFrame {
     }
     
     private void rentItem(String i, User u){
-        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File(".\\documents\\Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
         try {
             read = new BufferedReader(new FileReader(file));
