@@ -1,27 +1,33 @@
 package Inventory_System;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,6 +43,7 @@ import javax.swing.table.DefaultTableModel;
 public class Inventory_Modification {
 
 	private String selectedStore;
+	private List<String[]> userRentals;
 	
 	public void addItem() {
 		
@@ -339,8 +346,9 @@ public class Inventory_Modification {
                     writer.newLine();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception according to your needs
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
         // Replace the original file with the temporary file
@@ -348,9 +356,10 @@ public class Inventory_Modification {
             Files.delete(Paths.get(fileName));
             Files.move(Paths.get("temp.txt"), Paths.get(fileName));
             System.out.println("Item deleted successfully.");
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             System.out.println("Failed to delete item.");
-            e.printStackTrace(); // Handle the exception according to your needs
+            e.printStackTrace(); 
         }
     }
     
@@ -521,17 +530,270 @@ public class Inventory_Modification {
             }
         } 
         catch (IOException e) {
-            e.printStackTrace(); // Handle the exception according to your needs
+            e.printStackTrace();
         }
     }
     
   
 	
 	public void returnRental() {
-		System.out.println("Test return");
+			userRentals = new ArrayList<>();
 
+	        // Specify the file path
+	        String filePath = "User_Rentals.txt";
+
+	        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                // Add each line to the ArrayList
+	            	String[] rentalDetails = line.split(";");
+	                userRentals.add(rentalDetails);
+	                
+	            }
+	        } 
+	        catch (IOException e) {
+	            e.printStackTrace();
+	            System.out.println("Failed to read from User_Rentals.txt");
+	        }
+	        
+	        // Create a dropdown with user names
+	        String[] userNames = getUserNames();
+	        JComboBox<String> userDropdown = new JComboBox<>(userNames);
+
+	        // Create "View Items" and "Finished" buttons
+	        JButton viewItemsButton = new JButton("View Items");
+	        JButton finishedButton = new JButton("Finished");
+
+	        // Add action listener for "View Items" button (customize as needed)
+	        viewItemsButton.addActionListener(e -> {
+	            String selectedUser = (String) userDropdown.getSelectedItem();
+	            List<String[]> userRentalsFiltered = getUserRentalsForUser(selectedUser);
+
+	            JPanel itemsPanel = new JPanel(new GridLayout(userRentalsFiltered.size()+1, 3, 4, 4));
+
+	            for (String[] rentalDetails : userRentalsFiltered) {
+	                JCheckBox checkBox = new JCheckBox();
+	                checkBox.setText(rentalDetails[2]); // Adjust index
+	                
+	                String[] quantityOptions = getQuantityOptions(Integer.parseInt(rentalDetails[3])); // Adjust index
+	                JComboBox<String> quantityDropdown = new JComboBox<>(quantityOptions);
+	                JLabel storeName = new JLabel((String) rentalDetails[0]);
+	                
+	                itemsPanel.add(checkBox);
+	                itemsPanel.add(quantityDropdown);
+	                itemsPanel.add(storeName);
+	            }
+	            
+	            // Create "Return" and "Cancel" buttons
+	            JButton returnButton = new JButton("Return");
+	            JButton cancelButton = new JButton("Cancel");
+	            
+	            // Add action listener for "Return" button (customize as needed)
+	            returnButton.addActionListener(returnEvent -> {
+	            	
+	            	// Retrieve the selected items and quantities	            	
+	                for (Component component : itemsPanel.getComponents()) {
+	                    if (component instanceof JCheckBox) {
+	                        JCheckBox checkBox = (JCheckBox) component;
+
+	                        // Check if the item is selected
+	                        if (checkBox.isSelected()) {
+	                            String itemName = checkBox.getText();
+	                            // Extract item name if necessary
+
+	                            for (Component innerComponent : itemsPanel.getComponents()) {
+	                                if (innerComponent instanceof JComboBox) {
+	                                    JComboBox<String> quantityDropdown = (JComboBox<String>) innerComponent;
+
+	                                    // Check if this JComboBox is associated with the current JCheckBox
+	                                    if (checkBox.getY() == quantityDropdown.getY()) {
+	                                        // Retrieve the selected quantity
+	                                        String selectedQuantity = (String) quantityDropdown.getSelectedItem();
+	                                        
+	                                     // Retrieve the associated store name label
+	                                        JLabel storeLabel = (JLabel) itemsPanel.getComponent(itemsPanel.getComponentZOrder(quantityDropdown) + 1);
+
+	                                        returnItemToStore(itemName, Integer.parseInt(selectedQuantity), storeLabel.getText());
+	                                        removeItemFromRental(itemName, Integer.parseInt(selectedQuantity));
+	                                        
+	                                        
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    }
+	                    
+	                    Container parent = itemsPanel.getParent();
+
+	                    // Traverse up the hierarchy until a JDialog is found
+	                    while (parent != null && !(parent instanceof Window)) {
+	                    	parent = parent.getParent();
+	                    }
+
+	                    // Dispose of the window
+	                    if (parent instanceof Window) {
+	                    	((Window) parent).dispose();
+	                    }
+	                    
+	                    //Remove the grandparent JDialog
+	                    Container grandParent = parent != null ? parent.getParent() : null;
+	                    if (grandParent instanceof Window) {
+	                        ((Window) grandParent).dispose();
+	                    }
+	                }
+	            });
+
+	            // Add action listener for "Cancel" button (customize as needed)
+	            cancelButton.addActionListener(cancelEvent -> {
+	                //canceling the return process
+	                Container parent = cancelButton.getParent();
+	                while (parent != null && !(parent instanceof JOptionPane)) {
+	                    parent = parent.getParent();
+	                }
+	                if (parent instanceof JOptionPane) {
+	                    ((JOptionPane) parent).setValue(JOptionPane.CLOSED_OPTION);
+	                }
+	            });
+
+	            // Add buttons to the itemsPanel
+	            itemsPanel.add(returnButton);
+	            itemsPanel.add(cancelButton);
+	            JOptionPane.showOptionDialog(null, itemsPanel, "Return Rental - " + selectedUser, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+	        });
+
+	        // Add action listener for "Finished" button (customize as needed)
+	        finishedButton.addActionListener(e -> {
+	            // Add logic to finish and close the option pane
+	            JOptionPane.getRootFrame().dispose();
+	        });
+
+	        // Create a panel with components
+	        JPanel panel = new JPanel();
+	        panel.add(new JLabel("Select User:"));
+	        panel.add(userDropdown);
+	        panel.add(viewItemsButton);
+	        panel.add(finishedButton);
+
+	        // Show the option pane with the panel
+	        JOptionPane.showOptionDialog(null, panel, "Return Rental", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+
+	    }
+	private String[] getQuantityOptions(int stockCount) {
+			List<String> options = new ArrayList<>();
+			for (int i = 1; i <= stockCount; i++) {
+				options.add(String.valueOf(i));
+			}
+			return options.toArray(new String[0]);
+		}
+	
+	private List<String[]> getUserRentalsForUser(String selectedUser) {
+			List<String[]> userRentalsFiltered = new ArrayList<>();
+			for (String[] rentalDetails : userRentals) {
+				if (rentalDetails.length > 1 && rentalDetails[1].equals(selectedUser)) {
+					userRentalsFiltered.add(rentalDetails);
+				}
+			}
+			return userRentalsFiltered;
+		}
+	
+	private void removeItemFromRental(String itemName, int selectedQuantity) {
+		
+	    String filePath = "User_Rentals.txt";
+	    List<String> updatedLines = new ArrayList<>();
+
+	    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+	        String line;
+
+	        while ((line = reader.readLine()) != null) {
+	            String[] parts = line.split(";");
+	            String currentItemName = parts[2];
+	            int currentQuantity = Integer.parseInt(parts[3]);
+
+	            if (currentItemName.equals(itemName)) {
+	                currentQuantity -= selectedQuantity;
+	                
+	                // If the quantity becomes zero or negative, skip this line
+	                if (currentQuantity <= 0) {
+	                    continue;
+	                }
+
+	                // Update the quantity in the line
+	                String updatedLine = parts[0] + ";" + parts[1] + ";" + currentItemName + ";" + currentQuantity;
+	                updatedLines.add(updatedLine);
+	            } else {
+	                updatedLines.add(line);
+	            }
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        System.out.println("Failed to remove item from rental.");
+	        return;
+	    }
+
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+	        for (String updatedLine : updatedLines) {
+	            writer.write(updatedLine);
+	            writer.newLine();
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        System.out.println("Failed to update User_Rentals.txt after removing item.");
+	    }
 	}
+	
+    private String[] getUserNames() {
+        Set<String> userNames = new HashSet<>();
+        for (String[] rentalDetails : userRentals) {
+            if (rentalDetails.length > 0) {
+                userNames.add(rentalDetails[1]);
+            }
+        }
+        return userNames.toArray(new String[0]);
+    }
+    
+    private void returnItemToStore(String itemName, int quantity, String storeName) {
+    	//Store name
+    	String storeFilePath = "Buy_Better_" + storeName + ".txt";
+    	
+    	try (BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));) {
 
+    		String line;
+        	List<String> lines = new ArrayList<>();
+
+        	while ((line = reader.readLine()) != null) {
+        		
+        		String[] parts = line.split(";");
+        		String currentItemName = parts[1];
+        		int currentQuantity = Integer.parseInt(parts[5]);
+        		
+        		if (currentItemName.equals(itemName) && parts[6].equals("rent")) {
+        			currentQuantity += quantity;
+        			
+        			String updatedLine = parts[0] + ";" + parts[1] + ";" + parts[2] + ";" + parts[3] +
+        					";" + parts[4] + ";" + currentQuantity + ";" + parts[6];
+        			
+        			lines.add(updatedLine);
+        		}
+        		
+        		else {
+        			lines.add(line);
+        		}
+        	}
+        	
+        	try(BufferedWriter writer = new BufferedWriter(new FileWriter(storeFilePath))){
+        	
+        		for (String updatedLine : lines) {
+        			writer.append(updatedLine);
+        			writer.newLine();
+        		}
+            }
+        }
+    	
+    	catch(IOException e) {
+    		System.out.println("Failed to return item to the store.");
+    	}
+    }
+	
 	public static ArrayList<String[]> loadInventory(String store) {
 	    String fileName = "Buy_Better_" + store + ".txt";
 	    ArrayList<String[]> inventoryList = new ArrayList<>();
@@ -542,8 +804,9 @@ public class Inventory_Modification {
 	            String[] rowData = line.split(";");
 	            inventoryList.add(rowData);
 	        }
-	    } catch (IOException e) {
-	        e.printStackTrace(); // Handle the exception according to your needs
+	    } 
+	    catch (IOException e) {
+	        e.printStackTrace(); 
 	    }
 
 	    return inventoryList;
@@ -556,8 +819,10 @@ public class Inventory_Modification {
 	        while (reader.readLine() != null) {
 	            lines++;
 	        }
-	    } catch (IOException e) {
-	        e.printStackTrace(); // Handle the exception according to your needs
+	    } 
+	    
+	    catch (IOException e) {
+	        e.printStackTrace();
 	    }
 	    return lines;
 	}
