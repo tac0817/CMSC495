@@ -288,7 +288,7 @@ public class Inventory_Modification {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Update the table based on the selected store
-                updateTable((String) storeDropdown.getSelectedItem(), tableModel);
+                updateTable((String) storeDropdown.getSelectedItem(), tableModel, false);
             }
         });
 
@@ -301,9 +301,10 @@ public class Inventory_Modification {
                 if (selectedRow != -1) {
                     // Delete the item from the file
                     deleteItemFromFile((String) storeDropdown.getSelectedItem(), selectedRow);
-
+                    
+                    updateIdsInSource((String) storeDropdown.getSelectedItem());
                     // Update the table after deletion
-                    updateTable((String) storeDropdown.getSelectedItem(), tableModel);
+                    updateTable((String) storeDropdown.getSelectedItem(), tableModel, false);
                 } else {
                     JOptionPane.showMessageDialog(deleteItemFrame, "Please select an item to delete.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -315,18 +316,24 @@ public class Inventory_Modification {
         deleteItemFrame.setVisible(true);
     }
 	
-    private void updateTable(String store, DefaultTableModel tableModel) {
+    private void updateTable(String store, DefaultTableModel tableModel, boolean isTransfer) {
         // Load inventory for the selected store
         ArrayList<String[]> inventoryList = loadInventory(store);
 
         // Clear existing data from the table
         tableModel.setRowCount(0);
-
+        
         // Populate the table with columns 1 to 7
         for (String[] rowData : inventoryList) {
             // Ensure rowData has at least 7 columns
-            if (rowData.length >= 7) {
+        	
+            if (rowData.length >= 7 && !isTransfer) {
                 tableModel.addRow(Arrays.copyOf(rowData, 7));
+            }
+            else {
+            	Object[] modifiedRowData = Arrays.copyOf(rowData, 3); // Include the quantity
+                modifiedRowData[2] = rowData[5]; // Add the quantity to the 3rd column
+                tableModel.addRow(modifiedRowData);
             }
         }
     }
@@ -348,18 +355,16 @@ public class Inventory_Modification {
             }
         } 
         catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("The file could not be affected");
         }
 
         // Replace the original file with the temporary file
         try {
             Files.delete(Paths.get(fileName));
             Files.move(Paths.get("temp.txt"), Paths.get(fileName));
-            System.out.println("Item deleted successfully.");
         } 
         catch (IOException e) {
             System.out.println("Failed to delete item.");
-            e.printStackTrace(); 
         }
     }
     
@@ -374,13 +379,13 @@ public class Inventory_Modification {
         JComboBox<String> destinationStoreDropdown = new JComboBox<>(new String[]{"Towson", "Columbia", "Annapolis", "Rockville", "Frederick"});
 
         // Table for displaying items from the source store
-        String[] columnNamesSource = {"Item ID", "Item Name"};
+        String[] columnNamesSource = {"Item ID", "Item Name", "Stock"};
         DefaultTableModel sourceTableModel = new DefaultTableModel(columnNamesSource, 0);
         JTable sourceTable = new JTable(sourceTableModel);
         JScrollPane sourceTableScrollPane = new JScrollPane(sourceTable);
 
         // Table for displaying items to transfer
-        String[] columnNamesTransfer = {"Item ID", "Item Name"};
+        String[] columnNamesTransfer = {"Item ID", "Item Name", "Stock"};
         DefaultTableModel transferTableModel = new DefaultTableModel(columnNamesTransfer, 0);
         JTable transferTable = new JTable(transferTableModel);
         JScrollPane transferTableScrollPane = new JScrollPane(transferTable);
@@ -411,11 +416,11 @@ public class Inventory_Modification {
                 // Clear existing data from the source table
                 sourceTableModel.setRowCount(0);
 
-                // Populate the source table with columns 1 and 2
                 for (String[] rowData : sourceInventory) {
-                    // Ensure rowData has at least 2 columns
-                    if (rowData.length >= 2) {
-                        sourceTableModel.addRow(Arrays.copyOf(rowData, 2));
+                    if (rowData.length >= 3) {
+                        Object[] modifiedRowData = Arrays.copyOf(rowData, 3); // Include the quantity
+                        modifiedRowData[2] = rowData[5]; // Add the quantity to the 3rd column
+                        sourceTableModel.addRow(modifiedRowData);
                     }
                 }
             }
@@ -432,11 +437,12 @@ public class Inventory_Modification {
                 // Clear existing data from the destination table
                 transferTableModel.setRowCount(0);
 
-                // Populate the destination table with columns 1 and 2
+                // Populate the destination table
                 for (String[] rowData : destinationInventory) {
-                    // Ensure rowData has at least 2 columns
-                    if (rowData.length >= 2) {
-                        transferTableModel.addRow(Arrays.copyOf(rowData, 2));
+                    if (rowData.length >= 3) {
+                        Object[] modifiedRowData = Arrays.copyOf(rowData, 3); // Include the quantity
+                        modifiedRowData[2] = rowData[5]; // Add the quantity to the 3rd column
+                        transferTableModel.addRow(modifiedRowData);
                     }
                 }
             }
@@ -452,24 +458,28 @@ public class Inventory_Modification {
             public void actionPerformed(ActionEvent e) {
                 // Get the selected rows from the source table
                 int[] selectedRows = sourceTable.getSelectedRows();
+                
                 if (selectedRows.length > 0) {
                     for (int selectedRow : selectedRows) {
                         String selectedItemId = sourceTableModel.getValueAt(selectedRow, 0).toString();
                         String selectedItemName = sourceTableModel.getValueAt(selectedRow, 1).toString();
-                        transferItem(sourceStoreDropdown, destinationStoreDropdown, selectedItemId, selectedItemName);
+                        Integer selectedQuantity = Integer.parseInt(sourceTableModel.getValueAt(selectedRow, 2).toString());
+                        transferItem(sourceStoreDropdown, destinationStoreDropdown, selectedItemId, selectedItemName, selectedQuantity);
                     }
                     // Update the source and destination tables after transfer
-                    updateTable((String) sourceStoreDropdown.getSelectedItem(), sourceTableModel);
-                    updateTable((String) destinationStoreDropdown.getSelectedItem(), transferTableModel);
-                } else {
+                    updateTable((String) sourceStoreDropdown.getSelectedItem(), sourceTableModel, true);
+                    updateTable((String) destinationStoreDropdown.getSelectedItem(), transferTableModel, true);
+                }
+                else {
                     JOptionPane.showMessageDialog(transferItemFrame, "Please select an item to transfer.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
     }
- // Method to transfer item from source store to destination store
+    // Method to transfer item from source store to destination store
     private void transferItem(JComboBox<String> sourceDropdown, JComboBox<String> destinationDropdown,
-                               String selectedItemId, String selectedItemName) {
+                               String selectedItemId, String selectedItemName, int selectedQuantity) {
+    	
         String sourceStore = (String) sourceDropdown.getSelectedItem();
         String destinationStore = (String) destinationDropdown.getSelectedItem();
 
@@ -485,15 +495,32 @@ public class Inventory_Modification {
         // Read the destination inventory
         ArrayList<String[]> destinationInventory = loadInventory(destinationStore);
 
-        // Determine the destination item ID (current line number + 1)
-        int destinationItemId = getNumberOfLines("Buy_Better_" + destinationStore + ".txt") + 1;
+        // Check if the item already exists in the destination store
+        boolean itemExists = false;
+        
+        for (String[] destinationItem : destinationInventory) {
+            if (destinationItem.length >= 2 && destinationItem[1].equals(selectedItemName)) {
+                // Item already exists, update stock
+                int currentStock = Integer.parseInt(destinationItem[5]); // Assuming stock is in the 6th column
+                currentStock += selectedQuantity;
+                destinationItem[5] = String.valueOf(currentStock);
+                itemExists = true;
+                break;
+            }
+        }
+        
+        if (!itemExists) {
+            // Item does not exist, add a new entry with transferred stock count
+            // Determine the destination item ID (current line number + 1)
+            int destinationItemId = getNumberOfLines("Buy_Better_" + destinationStore + ".txt") + 1;
 
-        // Create the new line for the destination store
-        String newLine = destinationItemId + ";" + selectedItemName;
+            // Create the new line for the destination store
+            String newLine = destinationItemId + ";" + selectedItemName;
 
-        // Append the new line to the destination inventory
-        destinationInventory.add(newLine.split(";"));
-
+            // Append the new line to the destination inventory
+            destinationInventory.add(newLine.split(";"));
+        }
+        
         // Write back the updated destination inventory
         writeInventory(destinationStore, destinationInventory);
         

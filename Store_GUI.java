@@ -7,6 +7,7 @@ import java.io.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
+@SuppressWarnings("serial")
 public class Store_GUI extends JFrame {
 
     private JTextField searchBox;
@@ -158,7 +159,7 @@ public class Store_GUI extends JFrame {
 
     private void onSearchButtonClick() {
         String store = (String) storeLoc.getSelectedItem();
-        File file = new File("./src/Inventory_System/Buy_Better_" + store + ".txt");
+        File file = new File("Buy_Better_" + store + ".txt");
 
         BufferedReader read;
         results.setText("");
@@ -272,7 +273,7 @@ public class Store_GUI extends JFrame {
     }
 
     private float getItemPrice(String i) {
-        File file = new File("./src/Inventory_System/Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
 
         try {
@@ -297,7 +298,7 @@ public class Store_GUI extends JFrame {
     }
 
     private void checkoutItem(String i, int n) {
-        File file = new File("./src/Inventory_System/Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
         ArrayList<String> fileUpdate = new ArrayList<>();
 
@@ -315,7 +316,7 @@ public class Store_GUI extends JFrame {
             }
             
             
-            try (FileWriter writer = new FileWriter("./src/Inventory_System/Buy_Better_" + i.split("; ")[1] + ".txt")) {
+            try (FileWriter writer = new FileWriter("Buy_Better_" + i.split("; ")[1] + ".txt")) {
                 for (String str : fileUpdate) {
                     writer.write(str + System.lineSeparator());
                 }
@@ -331,11 +332,11 @@ public class Store_GUI extends JFrame {
     }
     
     private void rentItem(String i, User u){
-        File file = new File("./src/Inventory_System/Buy_Better_" + i.split("; ")[1] + ".txt");
+        File file = new File("Buy_Better_" + i.split("; ")[1] + ".txt");
         BufferedReader read;
         try {
             read = new BufferedReader(new FileReader(file));
-            try (FileWriter writer = new FileWriter("./src/Inventory_System/User_Rentals.txt")) {
+            try (FileWriter writer = new FileWriter("User_Rentals.txt")) {
                 String fileLine = read.readLine();
                 while (fileLine != null) {
                     if(fileLine.split(";")[1].equals(i.split(":")[0]) && fileLine.split(";")[6].equals("rent")){
