@@ -341,7 +341,7 @@ public class Store_GUI extends JFrame {
                 while (fileLine != null) {
                     if(fileLine.split(";")[1].equals(i.split(":")[0]) && fileLine.split(";")[6].equals("rent")){
                         String s = i.split("; ")[1] + ";" + u.getUsername() + ";" + i.split(":")[0] + ";" + fileLine.split(";")[5];
-                        writer.write(s + System.lineSeparator() );
+                        writer.write(s + "\n");
                     }
                     fileLine = read.readLine();
                 }
