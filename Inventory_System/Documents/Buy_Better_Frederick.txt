@@ -1,0 +1,21 @@
+1;Smart TV UltraVision 4K;Television;Immersive and interactive entertainment experience;$999.99;12;buy
+2;Espresso Elite 3000;Coffee Maker;Precision brewing with a sleek design;$149.99;18;buy
+3;Upright Pro Clean 1000;Vacuum Cleaner;Powerful and versatile cleaning solution;$249.99;15;buy
+4;Fusion Blitz 500;Blender - High-Performance;High-performance handles a variety of ingredients;$179.99;10;buy
+5;Aqua Clean 800;Dishwasher - Built-in;Advanced cleaning and a space-saving design;$699.99;10;buy
+6;Electric Bake Master Deluxe;Oven and Range;Precision cooking with modern design;$1,299.99;8;buy
+7;Tower Cool Breeze 300;Electric Fan;Powerful electric fan for cooling larger spaces.;$79.99;25;buy
+8;Convection Toast Master 2000;Toaster;High-quality toaster with convection technology.;$49.99;20;buy
+9;Infrared Heat Wave 1500;Heater;Infrared technology and cozy heating in any room.;$129.99;15;buy
+10;Professional StyleMaster 6000;Hair Dryer;High-performance hair dryer for professional use.;$69.99;10;buy
+11;Entertainment Hub 4K;Blu-ray/DVD Player;High-quality entertainment, 4K resolution.;$129.99;10;buy
+12;Modern Connect 3000;Cordless Phone;Modern features, reliable and convenient communication.;$79.99;8;buy
+13;High-Capacity Culinary Master 1200;Food Processor;Versatile, efficient food preparation high capacity.;$199.99;25;buy
+14;Deluxe Rice King 10;Rice Cooker;High-capacity, perfect large quantities.;$79.99;20;buy
+15;Power Blend Pro Chef 800;Stand Mixer;For professional mixing and blending in the kitchen.;$299.99;15;buy
+16;Healthy Cook Aero Fryer 1000;Air Fryer;Healthier cooking with air frying technology.;$119.99;18;buy
+17;Precision Cook Master Sous;Sous Vide Machine;Precise temperature cooking, with the utmost precision.;$179.99;15;buy
+18;Pro Capture UltraPixel 24;Digital Camera;High-resolution digital camera with 24 ultra-pixel precision.;$799.99;15;buy
+19;Portable Steam Quick Press;Handheld Steamer;Steamer design for precision cooking, efficient steaming.;$89.99;15;buy
+20;High-Resolution Digital Camera;Digital Camera;High-resolution digital cameras for rent, suitable for events, vacations, or short-term projects;$20.99;10;rent
+21;Industrial-Grade Handheld Steamer;Handheld Steamer;Industrial-grade handheld steamers for rent suitable for fashion shows or clothing events.;$11.99;15;rent
