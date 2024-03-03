@@ -336,12 +336,12 @@ public class Store_GUI extends JFrame {
         BufferedReader read;
         try {
             read = new BufferedReader(new FileReader(file));
-            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt", true)) {
+            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt")) {
                 String fileLine = read.readLine();
                 while (fileLine != null) {
                     if(fileLine.split(";")[1].equals(i.split(":")[0]) && fileLine.split(";")[6].equals("rent")){
                         String s = i.split("; ")[1] + ";" + u.getUsername() + ";" + i.split(":")[0] + ";" + fileLine.split(";")[5];
-                        writer.write(s + "\n");
+                        writer.write(s + System.lineSeparator() );
                     }
                     fileLine = read.readLine();
                 }
