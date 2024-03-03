@@ -336,7 +336,7 @@ public class Store_GUI extends JFrame {
         BufferedReader read;
         try {
             read = new BufferedReader(new FileReader(file));
-            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt")) {
+            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt", true)) {
                 String fileLine = read.readLine();
                 while (fileLine != null) {
                     if(fileLine.split(";")[1].equals(i.split(":")[0]) && fileLine.split(";")[6].equals("rent")){
