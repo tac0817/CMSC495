@@ -92,14 +92,22 @@ public class Store_GUI extends JFrame {
         userPanel.add(signoutButton);
         userPanel.add(stockText);
         userPanel.add(storeLoc);
-        userPanel.add(cartLabel);
-        userPanel.add(cart);
+        
+        if(!currentUser.isAdmin()) {
+        	userPanel.add(cartLabel);
+        	userPanel.add(cart);
+        }
+        
+        
         userPanel.add(searchBox);
         userPanel.add(searchButton);
         userPanel.add(results);
         userPanel.add(resultList);
-        userPanel.add(cButton);
-
+        
+        if(!currentUser.isAdmin()) {
+        	userPanel.add(cButton);
+        }
+        
         tabbedPane.addTab("Inventory System", userPanel);
 
         if (currentUser.isAdmin()) {
@@ -315,7 +323,7 @@ public class Store_GUI extends JFrame {
                 fileLine = read.readLine();
             }
             
-            
+             
             try (FileWriter writer = new FileWriter(".\\Documents\\Buy_Better_" + i.split("; ")[1] + ".txt")) {
                 for (String str : fileUpdate) {
                     writer.write(str + System.lineSeparator());
@@ -336,7 +344,7 @@ public class Store_GUI extends JFrame {
         BufferedReader read;
         try {
             read = new BufferedReader(new FileReader(file));
-            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt")) {
+            try (FileWriter writer = new FileWriter(".\\Documents\\User_Rentals.txt", true)) {
                 String fileLine = read.readLine();
                 while (fileLine != null) {
                     if(fileLine.split(";")[1].equals(i.split(":")[0]) && fileLine.split(";")[6].equals("rent")){

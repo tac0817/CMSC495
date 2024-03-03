@@ -14,7 +14,7 @@
 14;Professional StyleMaster 6000;Hair Dryer;High-performance hair dryer for professional use;$69.99;10;buy
 15;Entertainment Hub 4K;Blu-ray/DVD Player;High-quality entertainment, 4K resolution;$129.99;10;buy
 16;Stylist Curl Deluxe;Curling Iron;Advanced curling iron with temperature control;$49.99;20;buy
-17;Portable Electric Fan;Electric Fan;Portable fans for rent suitable for outdoor events or temporary cooling needs.;$5.99;32;rent
+17;Portable Electric Fan;Electric Fan;Portable fans for rent suitable for outdoor events or temporary cooling needs.;$5.99;30;rent
 18;Commercial-Grade Toaster;Toaster;Commercial-grade toasters for rent suitable for catering events or large gatherings;$10.99;12;rent
 19;Portable Space Heater;Heater;Portable space heaters for rent suitable for temporary heating in specific areas;$9.99;20;rent
 20;Salon-Quality Hair Dryer;Hair Dryer;Salon-quality hair dryers for rent suitable for events or special occasions;$7.99;15;rent

@@ -38,6 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Inventory_Modification {
@@ -183,7 +185,7 @@ public class Inventory_Modification {
 	            String description = descriptionArea.getText();
 	            String priceString = priceField.getText();
 	            String stock = stockField.getText();
-	            String rentOrBuy = rentRadioButton.isSelected() ? "Rent" : "Buy";
+	            String rentOrBuy = rentRadioButton.isSelected() ? "rent" : "buy";
 
 	            // Validate that all fields are filled
 	            if (itemName.isEmpty() || category.isEmpty() || description.isEmpty() ||
@@ -297,15 +299,19 @@ public class Inventory_Modification {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Get the selected row and delete the corresponding item
-                int selectedRow = inventoryTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Delete the item from the file
-                    deleteItemFromFile((String) storeDropdown.getSelectedItem(), selectedRow);
-                    
+                int[] selectedRows = inventoryTable.getSelectedRows();
+                if (selectedRows.length > 0) {
+                	
+                	// Loop through the selected rows and delete the corresponding items
+                    for (int i = selectedRows.length - 1; i >= 0; i--) {
+                        int selectedRow = selectedRows[i];
+                        deleteItemFromFile((String) storeDropdown.getSelectedItem(), selectedRow);
+                    }
                     updateIdsInSource((String) storeDropdown.getSelectedItem());
                     // Update the table after deletion
                     updateTable((String) storeDropdown.getSelectedItem(), tableModel, false);
-                } else {
+                } 
+                else {
                     JOptionPane.showMessageDialog(deleteItemFrame, "Please select an item to delete.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -456,19 +462,30 @@ public class Inventory_Modification {
         transferButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Get the selected rows from the source table
-                int[] selectedRows = sourceTable.getSelectedRows();
-                
-                if (selectedRows.length > 0) {
-                    for (int selectedRow : selectedRows) {
-                        String selectedItemId = sourceTableModel.getValueAt(selectedRow, 0).toString();
-                        String selectedItemName = sourceTableModel.getValueAt(selectedRow, 1).toString();
-                        Integer selectedQuantity = Integer.parseInt(sourceTableModel.getValueAt(selectedRow, 2).toString());
-                        transferItem(sourceStoreDropdown, destinationStoreDropdown, selectedItemId, selectedItemName, selectedQuantity);
+            	ListSelectionModel selectionModel = sourceTable.getSelectionModel();
+                if (selectionModel.getSelectionMode() == ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) {
+                    int[] selectedRows = sourceTable.getSelectedRows();
+                    if (selectedRows.length > 0) {
+                        for (int selectedRow : selectedRows) {
+                            
+                        	System.out.println("Selected Row: " + selectedRow);
+                            String selectedItemId = sourceTableModel.getValueAt(selectedRow, 0).toString();
+                            String selectedItemName = sourceTableModel.getValueAt(selectedRow, 1).toString();
+                            Integer selectedQuantity = Integer.parseInt(sourceTableModel.getValueAt(selectedRow, 2).toString());
+                            
+                            transferItem(sourceStoreDropdown, destinationStoreDropdown, selectedItemId, selectedItemName, selectedQuantity);
+
+                        }
                     }
-                    // Update the source and destination tables after transfer
-                    updateTable((String) sourceStoreDropdown.getSelectedItem(), sourceTableModel, true);
-                    updateTable((String) destinationStoreDropdown.getSelectedItem(), transferTableModel, true);
+                    SwingUtilities.invokeLater(() -> {
+
+                        // Now, after transferring all items, remove them from the source
+                        removeItemsFromSource(selectedRows, sourceStoreDropdown, sourceTableModel);
+                        
+                        updateTable((String) sourceStoreDropdown.getSelectedItem(), sourceTableModel, true);
+                        updateTable((String) destinationStoreDropdown.getSelectedItem(), transferTableModel, true);
+                    
+                    });
                 }
                 else {
                     JOptionPane.showMessageDialog(transferItemFrame, "Please select an item to transfer.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -476,56 +493,85 @@ public class Inventory_Modification {
             }
         });
     }
-    // Method to transfer item from source store to destination store
-    private void transferItem(JComboBox<String> sourceDropdown, JComboBox<String> destinationDropdown,
-                               String selectedItemId, String selectedItemName, int selectedQuantity) {
-    	
+    
+    // Method to remove transferred items from the source
+    private void removeItemsFromSource(int[] selectedRows, JComboBox<String> sourceDropdown, DefaultTableModel sourceTableModel) {
         String sourceStore = (String) sourceDropdown.getSelectedItem();
-        String destinationStore = (String) destinationDropdown.getSelectedItem();
-
-        // Read the source inventory
         ArrayList<String[]> sourceInventory = loadInventory(sourceStore);
 
-        // Remove the transferred item from the source inventory
-        sourceInventory.removeIf(row -> row.length >= 2 && row[0].equals(selectedItemId) && row[1].equals(selectedItemName));
+        for (int i = selectedRows.length - 1; i >= 0; i--) {
+            int selectedRow = selectedRows[i];
+            String selectedItemId = sourceTableModel.getValueAt(selectedRow, 0).toString();
+            String selectedItemName = sourceTableModel.getValueAt(selectedRow, 1).toString();
+
+            sourceInventory.removeIf(row -> row.length >= 2 && row[0].equals(selectedItemId) && row[1].equals(selectedItemName));
+        }
 
         // Write back the updated source inventory
         writeInventory(sourceStore, sourceInventory);
 
-        // Read the destination inventory
-        ArrayList<String[]> destinationInventory = loadInventory(destinationStore);
-
-        // Check if the item already exists in the destination store
-        boolean itemExists = false;
-        
-        for (String[] destinationItem : destinationInventory) {
-            if (destinationItem.length >= 2 && destinationItem[1].equals(selectedItemName)) {
-                // Item already exists, update stock
-                int currentStock = Integer.parseInt(destinationItem[5]); // Assuming stock is in the 6th column
-                currentStock += selectedQuantity;
-                destinationItem[5] = String.valueOf(currentStock);
-                itemExists = true;
-                break;
-            }
-        }
-        
-        if (!itemExists) {
-            // Item does not exist, add a new entry with transferred stock count
-            // Determine the destination item ID (current line number + 1)
-            int destinationItemId = getNumberOfLines(".\\Documents\\Buy_Better_" + destinationStore + ".txt") + 1;
-
-            // Create the new line for the destination store
-            String newLine = destinationItemId + ";" + selectedItemName;
-
-            // Append the new line to the destination inventory
-            destinationInventory.add(newLine.split(";"));
-        }
-        
-        // Write back the updated destination inventory
-        writeInventory(destinationStore, destinationInventory);
-        
         // Update IDs in the source inventory to start from 1 again
         updateIdsInSource(sourceStore);
+    }
+    
+    // Method to transfer item from source store to destination store
+    private void transferItem(JComboBox<String> sourceDropdown, JComboBox<String> destinationDropdown,
+                               String selectedItemId, String selectedItemName, int selectedQuantity) {
+    	
+    	 String sourceStore = (String) sourceDropdown.getSelectedItem();
+    	    String destinationStore = (String) destinationDropdown.getSelectedItem();
+
+    	    // Read the source inventory
+    	    ArrayList<String[]> sourceInventory = loadInventory(sourceStore);
+
+    	    // Find the item in the source inventory
+    	    String[] transferredItem = null;
+    	    for (String[] row : sourceInventory) {
+    	        if (row.length >= 2 && row[0].equals(selectedItemId) && row[1].equals(selectedItemName)) {
+    	            transferredItem = Arrays.copyOf(row, row.length);  // Capture the row before removal
+    	            break;
+    	        }
+    	    }
+
+    	    // Make sure transferredItem is not null before using it
+    	    if (transferredItem != null) {
+    	        // Read the destination inventory
+    	        ArrayList<String[]> destinationInventory = loadInventory(destinationStore);
+
+    	        // Check if the item already exists in the destination store
+    	        boolean itemExists = false;
+
+    	        for (String[] destinationItem : destinationInventory) {
+    	            if (destinationItem.length >= 2 && destinationItem[1].equals(selectedItemName)) {
+    	                // Item already exists, update stock
+    	                int currentStock = Integer.parseInt(destinationItem[5]); // Assuming stock is in the 6th column
+    	                currentStock += selectedQuantity;
+    	                destinationItem[5] = String.valueOf(currentStock);
+    	                itemExists = true;
+    	                break;
+    	            }
+    	        }
+
+    	        if (!itemExists) {
+    	            // Item does not exist, add a new entry with transferred stock count
+    	            // Determine the destination item ID (current line number + 1)
+    	            int destinationItemId = getNumberOfLines(".\\Documents\\Buy_Better_" + destinationStore + ".txt") + 1;
+
+    	            // Create the new line for the destination store
+    	            String newLine = destinationItemId + ";" + transferredItem[1] + ";" + transferredItem[2] + ";" + transferredItem[3] +
+    	                    ";" + transferredItem[4] + ";" + transferredItem[5] + ";" + transferredItem[6];
+
+    	            // Append the new line to the destination inventory
+    	            destinationInventory.add(newLine.split(";"));
+    	        }
+
+
+            // Write back the updated destination inventory
+            writeInventory(destinationStore, destinationInventory);
+
+            // Update IDs in the source inventory to start from 1 again
+            updateIdsInSource(sourceStore);
+        }
     }
     
     // Helper method to update IDs in the source inventory
@@ -579,7 +625,6 @@ public class Inventory_Modification {
 	            }
 	        } 
 	        catch (IOException e) {
-	            e.printStackTrace();
 	            System.out.println("Failed to read from User_Rentals.txt");
 	        }
 	        
@@ -725,7 +770,7 @@ public class Inventory_Modification {
 	
 	private void removeItemFromRental(String itemName, int selectedQuantity) {
 		
-	    String filePath = "User_Rentals.txt";
+	    String filePath = ".\\Documents\\User_Rentals.txt";
 	    List<String> updatedLines = new ArrayList<>();
 
 	    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
